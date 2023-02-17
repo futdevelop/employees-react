@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import nextId from "react-id-generator";
 
 import AppInfo from '../app-info/app-info';
 import SearchPanel from '../search-panel/search-panel';
@@ -13,36 +14,58 @@ class App extends Component{
 		super(props)
 		this.state = {
 			data: [
-				{ name: 'John C.', salary: 800, increase: false, id: 1 },
-				{ name: 'Alex M.', salary: 3000, increase: false, id: 2 },
-				{ name: 'Carl W.', salary: 5000, increase: false, id: 3 }
+				{ name: 'John C.', salary: 800, increase: false, rise: true, id: 1 },
+				{ name: 'Alex M.', salary: 3000, increase: false, rise: false, id: 2 },
+				{ name: 'Carl W.', salary: 5000, increase: false, rise: false, id: 3 }
 			]
 		}
+		this.maxId = 4;
+		this.htmlId = nextId();
 	}
 
 	deleteItem = id => {
 		this.setState(({data}) => {
-			data: data.filter(item => item.id !== id)
+			return {
+				data: data.filter(item => item.id !== id)
+			}
 		});
 	}
 
 	addItem = (name, salary) => {
-		const newObj = {
+		const newItem = {
 			name,
-			salary, 
+			salary,
 			increase: false,
-			id: 1
+			rise: false,
+			id: this.maxId++
 		}
-		this.setState(({data}) => {
-			const newArr = [...data, newObj]
+		this.setState(({ data }) => {
+			const newArr = [...data, newItem];
 			return {
 				data: newArr
 			}
-		})
+		});
+	}
+
+	onToggleIncrease = (id) => {
+		this.setState(({data}) => {
+			const index = data.findIndex(elem => elem.id === id);
+
+			const old = data[index];
+			const newItem = {...old, increase: !old.increase};
+			const newArr = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
+
+			return {
+				data: newArr
+			}
+		});
+	};
+
+	onToggleRise = (id) => {
+		console.log(`Rise ${id}`);
 	};
 	
 	render() {
-		const { data } = this.state;
 		return (
 			<div className="app">
 				<AppInfo />
@@ -51,16 +74,15 @@ class App extends Component{
 					<SearchPanel />
 					<AppFilter />
 				</div>
+
 				<EmployeesList
-					data={data}
-					onDelete={this.deleteItem}
-				/>
-				<EmployeesAddForm 
-					onAdd={this.addItem}
-				/>
+					data={this.state.data}
+					onDelete={this.deleteItem} 
+					onToggleIncrease={this.onToggleIncrease}
+					onToggleRise={this.onToggleRise}/>
+				<EmployeesAddForm onAdd={this.addItem} />
 			</div>
-		)
-		console.log(this.state.name)
+		);
 	}
 }
 
