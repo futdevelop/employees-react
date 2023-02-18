@@ -12,7 +12,7 @@ class SearchPanel extends Component {
 
 	onLocalUpdateSearch = (e) => {
 		const term = e.target.value;
-		this.setState({term});
+		this.setState({term}); //term: term
 		this.props.onUpdateSearch(term);
 	};
 
